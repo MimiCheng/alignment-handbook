@@ -4,7 +4,7 @@ model_revision: main
 torch_dtype: float16
 
 # LoRA arguments
-load_in_4bit: true
+load_in_4bit: false
 use_peft: true
 lora_r: 16
 lora_alpha: 16
@@ -35,7 +35,7 @@ gradient_accumulation_steps: 2
 gradient_checkpointing: true
 gradient_checkpointing_kwargs:
   use_reentrant: false
-hub_model_id: zephyr-7b-sft-qlora
+hub_model_id: mistral-7b-sft-qlora-2ep
 hub_strategy: every_save
 learning_rate: 2.0e-04
 log_level: info
@@ -44,14 +44,14 @@ logging_strategy: steps
 lr_scheduler_type: cosine
 max_seq_length: 2048
 max_steps: -1
-num_train_epochs: 1
-output_dir: data/zephyr-7b-sft-qlora
+num_train_epochs: 2
+output_dir: data/mistral-7b-sft-qlora-2ep
 overwrite_output_dir: true
 per_device_eval_batch_size: 8
 per_device_train_batch_size: 4
 push_to_hub: true
 report_to:
-- tensorboard
+- wandb
 save_strategy: "steps"
 save_steps: 100
 save_total_limit: 1

@@ -1,6 +1,7 @@
 # Model arguments
-model_name_or_path: alignment-handbook/zephyr-7b-sft-qlora
+model_name_or_path: mimicheng/zephyr-7b-sft-qlora
 torch_dtype: float16
+attn_implementation: flash_attention_2
 
 # LoRA arguments
 use_peft: true
@@ -32,10 +33,12 @@ beta: 0.01
 do_eval: true
 evaluation_strategy: steps
 eval_steps: 100
-gradient_accumulation_steps: 2
+gradient_accumulation_steps: 1
 gradient_checkpointing: true
 gradient_checkpointing_kwargs:
   use_reentrant: false
+report_to:
+- wandb
 hub_model_id: zephyr-7b-dpo-qlora
 learning_rate: 5.0e-6
 log_level: info
@@ -43,7 +46,7 @@ logging_steps: 10
 lr_scheduler_type: cosine
 max_length: 1024
 max_prompt_length: 512
-num_train_epochs: 1
+num_train_epochs: 2
 optim: paged_adamw_32bit
 output_dir: data/zephyr-7b-dpo-qlora # It is handy to append `hub_model_revision` to keep track of your local experiments
 per_device_train_batch_size: 4
