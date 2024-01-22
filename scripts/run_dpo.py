@@ -115,7 +115,7 @@ def main():
         model_args.torch_dtype if model_args.torch_dtype in ["auto", None] else getattr(torch, model_args.torch_dtype)
     )
     quantization_config = get_quantization_config(model_args)
-
+    print(f'QUANTIZATION CONFIG..... {quantization_config}')
     model_kwargs = dict(
         revision=model_args.model_revision,
         trust_remote_code=model_args.trust_remote_code,
@@ -125,7 +125,7 @@ def main():
         device_map=get_kbit_device_map() if quantization_config is not None else None,
         quantization_config=quantization_config,
     )
-
+    print(model_kwargs)
     model = model_args.model_name_or_path
     if is_adapter_model(model, model_args.model_revision) is True:
         # Load the base model, merge the adapter weights and unload the adapter
@@ -133,27 +133,36 @@ def main():
         logger.info(f"Merging PEFT adapters for {model_args.model_name_or_path}")
 
         peft_config = PeftConfig.from_pretrained(model_args.model_name_or_path, revision=model_args.model_revision)
-        print('peft config')
+        print('PEFT CONFIG...')
         print(peft_config)
-        model_kwargs = dict(
-            revision=model_args.base_model_revision,
-            trust_remote_code=model_args.trust_remote_code,
-            attn_implementation=model_args.attn_implementation,
-            torch_dtype=torch_dtype,
-            use_cache=False if training_args.gradient_checkpointing else True,
-        )
-        logger.info(f'Model Params:\n {model_kwargs}')
+        # model_kwargs = dict(
+        #     revision=model_args.base_model_revision,
+        #     trust_remote_code=model_args.trust_remote_code,
+        #     attn_implementation=model_args.attn_implementation,
+        #     torch_dtype=torch_dtype,
+        #     use_cache=False if training_args.gradient_checkpointing else True,
+        # )
+        logger.info(f'-----------------Model Params:\n {model_kwargs}')
+        
+
         base_model = AutoModelForCausalLM.from_pretrained(
             peft_config.base_model_name_or_path,
             **model_kwargs,
         )
+        # quantization_config = BitsAndBytesConfig(
+        #     load_in_4bit=True,
+        #     bnb_4bit_compute_dtype=torch.float16
+        # )
+        # base_model = AutoModelForCausalLM.from_pretrained(peft_config.base_model_name_or_path, quantization_config=quantization_config)
+
         model = PeftModel.from_pretrained(
             base_model, model_args.model_name_or_path, revision=model_args.model_revision
         )
+        
         model.eval()
         model = model.merge_and_unload()
         model_kwargs = None
-
+    logging.info('Successfully merged model... ')
     ref_model = model
     ref_model_kwargs = model_kwargs
 
@@ -179,7 +188,7 @@ def main():
         peft_config=get_peft_config(model_args),
         loss_type=training_args.loss_type,
     )
-
+    logging.info("Initialized DPO Model.")
     ###############
     # Training loop
     ###############
