@@ -40,7 +40,7 @@ def get_kbit_device_map() -> Dict[str, int] | None:
 
 
 def get_quantization_config(model_args) -> BitsAndBytesConfig | None:
-    
+
     if model_args.load_in_4bit:
         quantization_config = BitsAndBytesConfig(
             load_in_4bit=True,

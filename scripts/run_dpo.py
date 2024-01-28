@@ -142,18 +142,10 @@ def main():
         #     torch_dtype=torch_dtype,
         #     use_cache=False if training_args.gradient_checkpointing else True,
         # )
-        logger.info(f'-----------------Model Params:\n {model_kwargs}')
-        
-
         base_model = AutoModelForCausalLM.from_pretrained(
             peft_config.base_model_name_or_path,
             **model_kwargs,
         )
-        # quantization_config = BitsAndBytesConfig(
-        #     load_in_4bit=True,
-        #     bnb_4bit_compute_dtype=torch.float16
-        # )
-        # base_model = AutoModelForCausalLM.from_pretrained(peft_config.base_model_name_or_path, quantization_config=quantization_config)
 
         model = PeftModel.from_pretrained(
             base_model, model_args.model_name_or_path, revision=model_args.model_revision

@@ -126,7 +126,8 @@ def main():
         model_args.torch_dtype if model_args.torch_dtype in ["auto", None] else getattr(torch, model_args.torch_dtype)
     )
     quantization_config = get_quantization_config(model_args)
-
+    logging.info('*** Quantization config')
+    logging.info(quantization_config)
     model_kwargs = dict(
         revision=model_args.model_revision,
         trust_remote_code=model_args.trust_remote_code,
@@ -136,6 +137,8 @@ def main():
         device_map=get_kbit_device_map() if quantization_config is not None else None,
         quantization_config=quantization_config,
     )
+    logging.info('*** Get peft config ********************')
+    logging.info(get_peft_config(model_args))
     logger.info("*** Model loaded! ***")
 
     ########################
@@ -192,7 +195,7 @@ def main():
         "finetuned_from": model_args.model_name_or_path,
         "dataset": list(data_args.dataset_mixer.keys()),
         "dataset_tags": list(data_args.dataset_mixer.keys()),
-        "tags": ["alignment-handbook"],
+        "tags": ["dpo-experiment"],
     }
     if trainer.accelerator.is_main_process:
         trainer.create_model_card(**kwargs)
